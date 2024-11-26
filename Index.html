@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🌊 COSMIC ANNIHILATION SIMULATOR 9000 ULTRA EXTREME!!! 🔥</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            user-select: none; 
+        }
+        body, html {
+            height: 100%;
+            background: linear-gradient(135deg, #000000, #434343, #000000);
+            font-family: 'Orbitron', sans-serif;
+            overflow: hidden;
+            cursor: none;
+        }
+        #gameContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+        #cursor {
+            position: fixed;
+            pointer-events: none;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, rgba(255,0,0,0.7), rgba(255,0,0,0));
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            mix-blend-mode: screen;
+        }
+        #mainButton {
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ff6b6b, #e83e8c);
+            border: 15px solid #4ecdc4;
+            font-size: 36px;
+            color: white;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+            cursor: none;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: all 0.1s ease;
+            box-shadow: 
+                0 0 50px rgba(255,0,0,0.5),
+                0 0 100px rgba(255,106,0,0.3);
+        }
+        #mainButton:active {
+            transform: scale(0.95) rotateX(20deg) rotateY(20deg);
+            box-shadow: 
+                0 0 100px rgba(255,0,0,0.8),
+                0 0 200px rgba(255,106,0,0.6);
+        }
+        #statsContainer {
+            background: rgba(0,0,0,0.8);
+            border: 3px solid #4ecdc4;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4ecdc4;
+        }
+        .upgrade-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .upgrade-btn {
+            background: linear-gradient(45deg, #00ff87, #60efff);
+            border: none;
+            color: black;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .upgrade-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        #eventLog {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid #4ecdc4;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            width: 300px;
+            color: #4ecdc4;
+        }
+        .epic-event {
+            color: #ff6b6b;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff6b6b;
+        }
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="backgroundCanvas"></canvas>
+    <div id="cursor"></div>
+    <div id="gameContainer">
+        <div id="statsContainer">
+            <h1>🌋 COSMIC ANNIHILATION SIMULATOR 9000 🚀</h1>
+            <h2>UNIVERSAL DESTRUCTION: <span id="pointDisplay">0</span></h2>
+            <h3>APOCALYPSE LEVEL: <span id="levelDisplay">1</span></h3>
+        </div>
+
+        <button id="mainButton">OBLITERATE REALITY!!!</button>
+
+        <div class="upgrade-grid">
+            <button id="quantumCannon" class="upgrade-btn">QUANTUM CANNON</button>
+            <button id="antimatterBomb" class="upgrade-btn">ANTIMATTER BOMB</button>
+            <button id="blackholeLauncher" class="upgrade-btn">BLACK HOLE LAUNCHER</button>
+            <button id="multiverseRupture" class="upgrade-btn">MULTIVERSE RUPTURE</button>
+        </div>
+
+        <div id="eventLog"></div>
+    </div>
+
+    <script>
+        // ULTIMATE COSMIC DESTRUCTION ENGINE
+        let points = 0;
+        let apocalypseLevel = 1;
+        let clickPower = 1;
+        let upgrades = {
+            quantumCannon: 0,
+            antimatterBomb: 0,
+            blackholeLauncher: 0,
+            multiverseRupture: 0
+        };
+
+      
+        const mainButton = document.getElementById('mainButton');
+        const pointDisplay = document.getElementById('pointDisplay');
+        const levelDisplay = document.getElementById('levelDisplay');
+        const eventLog = document.getElementById('eventLog');
+        const cursor = document.getElementById('cursor');
+        const backgroundCanvas = document.getElementById('backgroundCanvas');
+        const ctx = backgroundCanvas.getContext('2d');
+
+        function resizeCanvas() {
+            backgroundCanvas.width = window.innerWidth;
+            backgroundCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+       
+        const stars = [];
+        function createStars() {
+            for (let i = 0; i < 200; i++) {
+                stars.push({
+                    x: Math.random() * backgroundCanvas.width,
+                    y: Math.random() * backgroundCanvas.height,
+                    radius: Math.random() * 2,
+                    speed: Math.random() * 0.5
+                });
+            }
+        }
+
+        function animateBackground() {
+            ctx.fillStyle = 'rgba(0,0,0,0.1)';
+            ctx.fillRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.fillStyle = `rgba(255,255,255,${Math.random()})`;
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                star.x += star.speed;
+                if (star.x > backgroundCanvas.width) star.x = 0;
+            });
+
+            requestAnimationFrame(animateBackground);
+        }
+
+        createStars();
+        animateBackground();
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = `${e.clientX}px`;
+            cursor.style.top = `${e.clientY}px`;
+        });
+
+        const DESTRUCTION_MESSAGES = [
+            "🌍 ENTIRE PLANET VAPORIZED IN MILLISECONDS!",
+            "🌟 SOLAR SYSTEM CRUSHED LIKE A PAPER CUP!",
+            "🌌 GALAXY DELETED FROM EXISTENCE!",
+            "🚀 MULTIVERSE SCREAMS IN TERROR!",
+            "💥 REALITY ITSELF BEGINS TO CRUMBLE!",
+            "🌊 COSMIC WAVES OF PURE DESTRUCTION!",
+            "👽 ALIEN CIVILIZATIONS OBLITERATED!"
+        ];
+
+        
+        function createParticleExplosion(x, y) {
+            const particleCount = 100;
+            const particles = [];
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    radius: Math.random() * 5,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                    alpha: 1
+                });
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+
+                particles.forEach((p, index) => {
+                    ctx.beginPath();
+                    ctx.fillStyle = `rgba(${p.color}, ${p.alpha})`;
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.alpha -= 0.02;
+
+                    if (p.alpha <= 0) {
+                        particles.splice(index, 1);
+                    }
+                });
+
+                if (particles.length > 0) {
+                    requestAnimationFrame(animateParticles);
+                }
+            }
+
+            animateParticles();
+        }
+
+    
+        function logEvent(message, isEpic = false) {
+            const eventElement = document.createElement('div');
+            eventElement.textContent = message;
+            if (isEpic) eventElement.classList.add('epic-event');
+            eventLog.insertBefore(eventElement, eventLog.firstChild);
+            
+            if (eventLog.children.length > 15) {
+                eventLog.removeChild(eventLog.lastChild);
+            }
+        }
+
+     
+        mainButton.addEventListener('click', (event) => {
+            points += clickPower;
+            createParticleExplosion(event.clientX, event.clientY);
+            
+            if (Math.random() < 0.15) {
+                const epicMessage = DESTRUCTION_MESSAGES[Math.floor(Math.random() * DESTRUCTION_MESSAGES.length)];
+                const bonus = Math.floor(Math.random() * 200) + 100;
+                points += bonus;
+                logEvent(epicMessage, true);
+            }
+            
+            pointDisplay.textContent = Math.floor(points);
+            
+            if (points >= apocalypseLevel * 2000) {
+                apocalypseLevel++;
+                logEvent(`🎉 APOCALYPSE LEVEL INCREASED TO ${apocalypseLevel}! REALITY TREMBLES!`, true);
+                mainButton.textContent = `OBLITERATE LEVEL ${apocalypseLevel}!!!`;
+            }
+        });
+
+       
+        function createUpgradeHandler(upgradeName, baseCost) {
+            const upgradeButton = document.getElementById(upgradeName);
+            
+            upgradeButton.addEventListener('click', () => {
+                const currentLevel = upgrades[upgradeName];
+                const cost = Math.floor(baseCost * Math.pow(1.5, currentLevel));
+                
+                if (points >= cost) {
+                    points -= cost;
+                    upgrades[upgradeName]++;
+                    clickPower += 5;
+                    
+                    upgradeButton.textContent = `${upgradeName.toUpperCase()} (${upgrades[upgradeName]})`;
+                    logEvent(`🚀 ${upgradeName.toUpperCase()} UPGRADED! DESTRUCTION INTENSIFIES!`);
+                    
+                    pointDisplay.textContent = Math.floor(points);
+                }
+            });
+        }
+
+        
+        createUpgradeHandler('quantumCannon', 100);
+        createUpgradeHandler('antimatterBomb', 250);
+        createUpgradeHandler('blackholeLauncher', 500);
+        createUpgradeHandler('multiverseRupture', 1000);
+
+       
+        setInterval(() => {
+            const passivePoints = 
+                upgrades.quantumCannon * 10 + 
+                upgrades.antimatterBomb * 25 + 
+                upgrades.blackholeLauncher * 50 + 
+                upgrades.multiverseRupture * 100;
+            
+            points += passivePoints;
+            pointDisplay.textContent = Math.floor(points);
+        }, 1000);
+    </script>
+</body>
+</html>
